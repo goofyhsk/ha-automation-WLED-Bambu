@@ -3,7 +3,7 @@ description: ""
 triggers:
   - trigger: state
     entity_id:
-      - sensor.x1c_00m09d481300476_print_progress
+      - sensor.x1c_[[SERIAL]]_print_progress
     id: X1C_Change_Progress
     alias: X1C_Change_Progress
   - alias: X1C_Riser_Strip_Status

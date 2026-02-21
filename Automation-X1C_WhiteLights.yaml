@@ -4,7 +4,7 @@ triggers:
   - alias: X1C_Light_On
     trigger: state
     entity_id:
-      - light.x1c_00m09d481300476_chamber_light
+      - light.x1c_[[SERIAL]]_chamber_light
     for:
       hours: 0
       minutes: 0
@@ -17,7 +17,7 @@ triggers:
   - alias: X1C_Light_Off
     trigger: state
     entity_id:
-      - light.x1c_00m09d481300476_chamber_light
+      - light.x1c_[[SERIAL]]_chamber_light
     for:
       hours: 0
       minutes: 0
