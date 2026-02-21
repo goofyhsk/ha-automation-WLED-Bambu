@@ -1,0 +1,17 @@
+rest_command:
+    custom_wled_command:
+        url: http://192.168.1.61/json/state
+        method: POST
+        content_type: "application/json"
+        payload: >
+          {
+            "seg": [{
+            "id": {{ seg_id }},
+              "col": [
+                [{{ pri_r }}, {{ pri_g }}, {{ pri_b }}],
+                [{{ sec_r }}, {{ sec_g }}, {{ sec_b }}],
+                [{{ ter_r }}, {{ ter_g }}, {{ ter_b }}]
+              ],
+              "sel":true
+            }]
+          }}
