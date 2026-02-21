@@ -1,0 +1,191 @@
+alias: X1C_WLED_12_Strip
+description: ""
+triggers:
+  - trigger: state
+    entity_id:
+      - sensor.x1c_00m09d481300476_print_progress
+    id: X1C_Change_Progress
+    alias: X1C_Change_Progress
+  - alias: X1C_Riser_Strip_Status
+    trigger: state
+    entity_id:
+      - light.rgbw_strip
+    id: X1C_Riser_Strip_Status
+  - device_id: aca5fec21f041aeb73e4d2525b316e28
+    domain: bambu_lab
+    type: event_print_error
+    trigger: device
+    id: X1C_Error
+    alias: X1C_Error
+  - alias: X1C_Print_Status
+    trigger: state
+    entity_id:
+      - sensor.x1c_[[SERIAL]]_print_status
+    id: X1C_Print_Status
+  - alias: X1C_Status_Idle
+    trigger: state
+    entity_id:
+      - sensor.x1c_[[SERIAL]]_print_status
+    id: X1C_Status_Idle
+    attribute: Idle
+conditions: []
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id:
+              - X1C_Change_Progress
+          - condition: state
+            entity_id: sensor.x1c_[[SERIAL]]6_current_stage
+            state:
+              - printing
+        sequence:
+          - action: light.turn_on
+            metadata: {}
+            target:
+              entity_id: light.wl_tr_b_segment_2
+            data:
+              effect: percent
+              rgb_color:
+                - 195
+                - 195
+                - 254
+              brightness_pct: "{{ states('sensor.wledring_light_brightness') }}"
+          - metadata: {}
+            data:
+              value: >-
+                {{ states('sensor.x1c_[[SERIAL]]_print_progress') |
+                float(0) }}
+            target:
+              entity_id: number.wl_tr_b_segment_2_intensity
+            action: number.set_value
+        alias: X1C_Progress_Bar
+      - conditions:
+          - condition: trigger
+            id:
+              - X1C_Riser_Strip_Status
+        sequence:
+          - action: light.turn_on
+            metadata: {}
+            data:
+              rgb_color:
+                - 255
+                - 255
+                - 255
+              brightness_pct: "{{ states('sensor.wledring_light_brightness') }}"
+              effect: breathe
+            target:
+              entity_id: light.wl_tr_b_segment_1
+        alias: X1C_Light_RGB
+      - conditions:
+          - condition: trigger
+            id:
+              - X1C_Error
+            enabled: false
+          - condition: state
+            entity_id: binary_sensor.x1c_[[SERIAL]]_print_error
+            state:
+              - "on"
+        sequence:
+          - action: light.turn_on
+            metadata: {}
+            target:
+              entity_id: light.wl_tr_b_segment_2
+            data:
+              rgb_color:
+                - 255
+                - 0
+                - 0
+              effect: blink
+              brightness_pct: "{{ states('sensor.wledring_light_brightness') }}"
+          - action: number.set_value
+            metadata: {}
+            target:
+              entity_id: number.wl_tr_b_segment_2_speed
+            data:
+              value: "180"
+          - action: number.set_value
+            metadata: {}
+            target:
+              entity_id: number.wl_tr_b_segment_2_intensity
+            data:
+              value: "50"
+        alias: X1C_Error
+      - conditions:
+          - condition: trigger
+            id:
+              - X1C_Print_Status
+            enabled: false
+          - condition: state
+            entity_id: sensor.x1c_[[SERIAL]]_print_status
+            state:
+              - prepare
+        sequence:
+          - action: select.select_option
+            metadata: {}
+            target:
+              entity_id: select.wl_tr_b_segment_2_color_palette
+            data:
+              option: "* Color Gradient"
+          - action: number.set_value
+            metadata: {}
+            target:
+              entity_id: number.wl_tr_b_segment_2_speed
+            data:
+              value: "128"
+          - action: number.set_value
+            metadata: {}
+            target:
+              entity_id: number.wl_tr_b_segment_2_intensity
+            data:
+              value: "128"
+          - action: light.turn_on
+            metadata: {}
+            target:
+              entity_id: light.wl_tr_b_segment_2
+            data:
+              rgb_color:
+                - 255
+                - 165
+                - 0
+              brightness_pct: "{{ states('sensor.wledring_light_brightness') }}"
+              effect: Flow
+        alias: X1C_Preparing
+      - conditions:
+          - condition: state
+            entity_id: sensor.x1c_[[SERIAL]]_print_status
+            state:
+              - finish
+        sequence:
+          - action: light.turn_on
+            metadata: {}
+            target:
+              entity_id: light.wl_tr_b_segment_2
+            data:
+              color_name: green
+              brightness_pct: "{{ states('sensor.wledring_light_brightness') }}"
+          - action: select.select_option
+            metadata: {}
+            target:
+              entity_id: select.wl_tr_b_segment_2_color_palette
+            data:
+              option: Default
+          - if:
+              - condition: state
+                entity_id: binary_sensor.x1c_00m09d481300476_enclosure_door
+                state:
+                  - "on"
+            then:
+              - action: light.turn_off
+                metadata: {}
+                target:
+                  entity_id: light.wl_tr_b_segment_2
+                data: {}
+    default:
+      - action: light.turn_on
+        metadata: {}
+        target:
+          entity_id: light.wl_tr_b_main
+        data:
+          brightness_pct: "{{ states('sensor.wledring_light_brightness') }}"
+mode: single
