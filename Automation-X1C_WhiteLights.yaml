@@ -1,0 +1,141 @@
+alias: X1C_WhiteLights
+description: If the Chamber Light is on, WLED Ring
+triggers:
+  - alias: X1C_Light_On
+    trigger: state
+    entity_id:
+      - light.x1c_00m09d481300476_chamber_light
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 2
+    id: X1C_Light_On
+    from:
+      - "off"
+    to:
+      - "on"
+  - alias: X1C_Light_Off
+    trigger: state
+    entity_id:
+      - light.x1c_00m09d481300476_chamber_light
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 2
+    id: X1C_Light_Off
+    from:
+      - "on"
+    to:
+      - "off"
+  - alias: X1C_Riser_Strip_On
+    trigger: state
+    entity_id:
+      - light.rgbw_strip
+    id: X1C_Riser_Strip_On
+    from:
+      - "off"
+    to:
+      - "on"
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 2
+  - alias: X1C_Riser_Strip_Off
+    trigger: state
+    entity_id:
+      - light.rgbw_strip
+    id: X1C_Riser_Strip_Off
+    from:
+      - "on"
+    to:
+      - "off"
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 2
+conditions: []
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id:
+              - X1C_Light_On
+        sequence:
+          - action: light.turn_on
+            metadata: {}
+            data:
+              rgb_color:
+                - 255
+                - 255
+                - 255
+              brightness_pct: "{{ states('sensor.wledring_light_brightness') }}"
+              effect: breathe
+            target:
+              entity_id: light.wl_tr_b
+        alias: X1C_LightChamber_On
+      - conditions:
+          - condition: trigger
+            id:
+              - X1C_Light_Off
+        sequence:
+          - action: light.turn_off
+            metadata: {}
+            target:
+              entity_id: light.wl_tr_b
+        alias: X1C_LightChamber_Off
+      - conditions:
+          - condition: trigger
+            id:
+              - X1C_Riser_Strip_On
+        sequence:
+          - action: light.turn_on
+            metadata: {}
+            data:
+              brightness_pct: "{{ states('sensor.wledring_light_brightness') }}"
+              effect: breathe
+            target:
+              entity_id: light.wl_tr_b_segment_1
+            enabled: false
+          - action: rest_command.custom_wled_command
+            metadata: {}
+            data:
+              seg_id: 1
+              pri_r: 0
+              pri_g: 0
+              pri_b: 0
+              sec_r: 255
+              sec_g: 255
+              sec_b: 255
+              ter_r: 0
+              ter_g: 0
+              ter_b: 0
+            enabled: true
+          - action: light.turn_on
+            metadata: {}
+            target:
+              entity_id: light.wl_tr_b_segment_1
+            data:
+              effect: breathe
+              reverse: false
+              brightness_pct: "{{ states('sensor.wledring_light_brightness') }}"
+            enabled: true
+        alias: X1C_Riser_Strip_On
+      - conditions:
+          - condition: trigger
+            id:
+              - X1C_Riser_Strip_Off
+        sequence:
+          - action: light.turn_off
+            metadata: {}
+            target:
+              entity_id: light.wl_tr_b_segment_1
+            data: {}
+        alias: X1C_Riser_Strip_Off
+    default:
+      - action: light.turn_on
+        metadata: {}
+        target:
+          entity_id: light.wl_tr_b_main
+        data:
+          brightness_pct: "{{ states('sensor.wledring_light_brightness') }}"
+mode: single
