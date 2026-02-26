@@ -1,29 +1,37 @@
-16 LED WS2182B Ring + GLEDOPTO ESP8266
-WL-TR-B # WLED - Tonys Room - B?
-light.wl_tr_b_main
+16 LED WS2182B Ring + GLEDOPTO ~~ESP8266~~ ESP32  
+WL-TR-E32 # WLED - Tonys Room - E32  
+light.wl_tr_b_main  
 
-Segment 0:
-  Start: 0
-  Stop: 2
-  # 2 LEDS, Start of Ring
-  N: Status_L_X1C # X1C Chamber Light On/Off
-Entity: light.wl_tr_b
-Friendly: WL-TR-B_LightChamberStatus
-
-
-Segment 1:
-  Start: 14
-  Stop: 16
-  # 2 LEDS, End of Ring
-  N: Status_L_Riser # RGBW LED Strip inside X1C Riser
-Entity: light.wl_tr_b_segment_1
-Friendly: WL-TR-B_LightStripStatus
-
-
-Segment 2:
-  Start: 3
-  Stop: 13
-  # 10 LEDS, Middle of Ring
-  N: Status_L_X1C # X1C Chamber Light On/Off
-Entity: light.wl_tr_b_segment_2
-Friendly: WL-TR-B_MachineStatus
+Segment 0:  
+  Start: 0  
+  Stop: 2  
+  \# 2 LEDS, Start of Ring  
+  N: Status_L_X1C # X1C Chamber Light On/Off  
+Entity: light.wl_tr_e32_lightchamberstatus  
+Friendly: WL-TR-E32_LightChamberStatus  
+  
+  
+Segment 1:  
+  Start: 14  
+  Stop: 16  
+  \# 2 LEDS, End of Ring  
+  N: Status_L_Riser # RGBW LED Strip inside X1C Riser  
+Entity: light.wl_tr_e32_lightstripstatus  
+Friendly: WL-TR-E32_LightStripStatus  
+  
+  
+Segment 2:  
+  Start: 3  
+  Stop: 13  
+  \# 10 LEDS, Middle of Ring  
+  N: Status_L_X1C # X1C Chamber Light On/Off  
+Entity: light.wl_tr_e32_machinestatus  
+Friendly: WL-TR-E32_MachineStatus  
+  
+*Segment 3:  
+  Start: 3  
+  Stop: 4  
+  \# 1 LEDS, After LightChamberStatus  
+  N: ShopAmp # BT AMP Workshop On/Off  
+Entity: light.wl_tr_e32_shopamp  
+Friendly: WL-TR-E32_ShopAmp*

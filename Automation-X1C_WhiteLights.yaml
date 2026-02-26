@@ -71,7 +71,7 @@ actions:
               brightness_pct: "{{ states('sensor.wledring_light_brightness') }}"
               effect: breathe
             target:
-              entity_id: light.wl_tr_b
+              entity_id: light.wl_tr_e32_lightchamberstatus
         alias: X1C_LightChamber_On
       - conditions:
           - condition: trigger
@@ -81,7 +81,7 @@ actions:
           - action: light.turn_off
             metadata: {}
             target:
-              entity_id: light.wl_tr_b
+              entity_id: light.wl_tr_e32_lightchamberstatus
         alias: X1C_LightChamber_Off
       - conditions:
           - condition: trigger
@@ -94,7 +94,7 @@ actions:
               brightness_pct: "{{ states('sensor.wledring_light_brightness') }}"
               effect: breathe
             target:
-              entity_id: light.wl_tr_b_segment_1
+              entity_id: light.wl_tr_e32_lightstripstatus
             enabled: false
           - action: rest_command.custom_wled_command
             metadata: {}
@@ -113,10 +113,9 @@ actions:
           - action: light.turn_on
             metadata: {}
             target:
-              entity_id: light.wl_tr_b_segment_1
+              entity_id: light.wl_tr_e32_lightstripstatus
             data:
               effect: breathe
-              reverse: false
               brightness_pct: "{{ states('sensor.wledring_light_brightness') }}"
             enabled: true
         alias: X1C_Riser_Strip_On
@@ -128,14 +127,14 @@ actions:
           - action: light.turn_off
             metadata: {}
             target:
-              entity_id: light.wl_tr_b_segment_1
+              entity_id: llight.wl_tr_e32_lightstripstatus
             data: {}
         alias: X1C_Riser_Strip_Off
     default:
       - action: light.turn_on
         metadata: {}
         target:
-          entity_id: light.wl_tr_b_main
+          entity_id: light.wl_tr_e32_main
         data:
           brightness_pct: "{{ states('sensor.wledring_light_brightness') }}"
 mode: single
