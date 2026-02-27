@@ -1,4 +1,4 @@
-alias: X1C_WLED_12_Strip
+alias: X1C_WLED_16_Strip
 description: ""
 triggers:
   - trigger: state
@@ -28,6 +28,58 @@ triggers:
       - sensor.x1c_[[SERIAL]]_print_status
     id: X1C_Status_Idle
     attribute: Idle
+  - alias: X1C_Light_On
+    trigger: state
+    entity_id:
+      - light.x1c_[[SERIAL]]_chamber_light
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 2
+    id: X1C_Light_On
+    from:
+      - "off"
+    to:
+      - "on"
+  - alias: X1C_Light_Off
+    trigger: state
+    entity_id:
+      - light.x1c_[[SERIAL]]_chamber_light
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 2
+    id: X1C_Light_Off
+    from:
+      - "on"
+    to:
+      - "off"
+  - alias: X1C_Riser_Strip_On
+    trigger: state
+    entity_id:
+      - light.rgbw_strip
+    id: X1C_Riser_Strip_On
+    from:
+      - "off"
+    to:
+      - "on"
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 2
+  - alias: X1C_Riser_Strip_Off
+    trigger: state
+    entity_id:
+      - light.rgbw_strip
+    id: X1C_Riser_Strip_Off
+    from:
+      - "on"
+    to:
+      - "off"
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 2
 conditions: []
 actions:
   - choose:
@@ -43,7 +95,7 @@ actions:
           - action: light.turn_on
             metadata: {}
             target:
-              entity_id: light.wl_tr_b_segment_2
+              entity_id: light.wl_tr_e32_segment_2
             data:
               effect: percent
               rgb_color:
@@ -57,7 +109,7 @@ actions:
                 {{ states('sensor.x1c_[[SERIAL]]_print_progress') |
                 float(0) }}
             target:
-              entity_id: number.wl_tr_b_segment_2_intensity
+              entity_id: number.wl_tr_e32_segment_2_intensity
             action: number.set_value
         alias: X1C_Progress_Bar
       - conditions:
@@ -75,7 +127,7 @@ actions:
               brightness_pct: "{{ states('sensor.wledring_light_brightness') }}"
               effect: breathe
             target:
-              entity_id: light.wl_tr_b_segment_1
+              entity_id: light.wl_tr_e32_segment_1
         alias: X1C_Light_RGB
       - conditions:
           - condition: trigger
@@ -90,7 +142,7 @@ actions:
           - action: light.turn_on
             metadata: {}
             target:
-              entity_id: light.wl_tr_b_segment_2
+              entity_id: light.wl_tr_e32_segment_2
             data:
               rgb_color:
                 - 255
@@ -101,13 +153,13 @@ actions:
           - action: number.set_value
             metadata: {}
             target:
-              entity_id: number.wl_tr_b_segment_2_speed
+              entity_id: number.wl_tr_e32_segment_2_speed
             data:
               value: "180"
           - action: number.set_value
             metadata: {}
             target:
-              entity_id: number.wl_tr_b_segment_2_intensity
+              entity_id: number.wl_tr_e32_segment_2_intensity
             data:
               value: "50"
         alias: X1C_Error
@@ -124,25 +176,25 @@ actions:
           - action: select.select_option
             metadata: {}
             target:
-              entity_id: select.wl_tr_b_segment_2_color_palette
+              entity_id: select.wl_tr_e32_segment_2_color_palette
             data:
               option: "* Color Gradient"
           - action: number.set_value
             metadata: {}
             target:
-              entity_id: number.wl_tr_b_segment_2_speed
+              entity_id: number.wl_tr_e32_segment_2_speed
             data:
               value: "128"
           - action: number.set_value
             metadata: {}
             target:
-              entity_id: number.wl_tr_b_segment_2_intensity
+              entity_id: number.wl_tr_e32_segment_2_intensity
             data:
               value: "128"
           - action: light.turn_on
             metadata: {}
             target:
-              entity_id: light.wl_tr_b_segment_2
+              entity_id: light.wl_tr_e32_segment_2
             data:
               rgb_color:
                 - 255
@@ -160,32 +212,115 @@ actions:
           - action: light.turn_on
             metadata: {}
             target:
-              entity_id: light.wl_tr_b_segment_2
+              entity_id: light.wl_tr_e32_segment_2
             data:
               color_name: green
               brightness_pct: "{{ states('sensor.wledring_light_brightness') }}"
           - action: select.select_option
             metadata: {}
             target:
-              entity_id: select.wl_tr_b_segment_2_color_palette
+              entity_id: select.wl_tr_e32_segment_2_color_palette
             data:
               option: Default
           - if:
               - condition: state
-                entity_id: binary_sensor.x1c_00m09d481300476_enclosure_door
+                entity_id: binary_sensor.x1c_[[SERIAL]]_enclosure_door
                 state:
                   - "on"
             then:
               - action: light.turn_off
                 metadata: {}
                 target:
-                  entity_id: light.wl_tr_b_segment_2
+                  entity_id: light.wl_tr_e32_segment_2
                 data: {}
     default:
       - action: light.turn_on
         metadata: {}
         target:
-          entity_id: light.wl_tr_b_main
+          entity_id: light.wl_tr_e32_main
         data:
           brightness_pct: "{{ states('sensor.wledring_light_brightness') }}"
+  - choose:
+      - conditions:
+          - condition: trigger
+            id:
+              - X1C_Light_On
+        sequence:
+          - action: light.turn_on
+            metadata: {}
+            data:
+              rgb_color:
+                - 255
+                - 255
+                - 255
+              brightness_pct: "{{ states('sensor.wledring_light_brightness') }}"
+              effect: breathe
+            target:
+              entity_id: light.wl_tr_e32_lightchamberstatus
+        alias: X1C_LightChamber_On
+      - conditions:
+          - condition: trigger
+            id:
+              - X1C_Light_Off
+        sequence:
+          - action: light.turn_off
+            metadata: {}
+            target:
+              entity_id: light.wl_tr_e32_lightchamberstatus
+        alias: X1C_LightChamber_Off
+      - conditions:
+          - condition: trigger
+            id:
+              - X1C_Riser_Strip_On
+        sequence:
+          - action: light.turn_on
+            metadata: {}
+            data:
+              brightness_pct: "{{ states('sensor.wledring_light_brightness') }}"
+              effect: breathe
+            target:
+              entity_id: light.wl_tr_e32_lightstripstatus
+            enabled: false
+          - action: rest_command.custom_wled_command
+            metadata: {}
+            data:
+              seg_id: 1
+              pri_r: 0
+              pri_g: 0
+              pri_b: 0
+              sec_r: 255
+              sec_g: 255
+              sec_b: 255
+              ter_r: 0
+              ter_g: 0
+              ter_b: 0
+            enabled: true
+          - action: light.turn_on
+            metadata: {}
+            target:
+              entity_id: light.wl_tr_e32_lightstripstatus
+            data:
+              effect: breathe
+              brightness_pct: "{{ states('sensor.wledring_light_brightness') }}"
+            enabled: true
+        alias: X1C_Riser_Strip_On
+      - conditions:
+          - condition: trigger
+            id:
+              - X1C_Riser_Strip_Off
+        sequence:
+          - action: light.turn_off
+            metadata: {}
+            target:
+              entity_id: light.wl_tr_e32_lightstripstatus
+            data: {}
+        alias: X1C_Riser_Strip_Off
+    default:
+      - action: light.turn_on
+        metadata: {}
+        target:
+          entity_id: light.wl_tr_e32_main
+        data:
+          brightness_pct: "{{ states('sensor.wledring_light_brightness') }}"
+    alias: Chamber Light and Riser Light
 mode: single
