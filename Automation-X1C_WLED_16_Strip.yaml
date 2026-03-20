@@ -75,6 +75,17 @@ triggers:
       hours: 0
       minutes: 0
       seconds: 2
+  - alias: X1C_Door_Open
+    trigger: state
+    entity_id:
+      - binary_sensor.x1c_00m09d481300476_enclosure_door
+    to:
+      - "on"
+    id: X1C_Door_Open
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 1
 conditions: []
 actions:
   - choose:
@@ -114,6 +125,21 @@ actions:
                     target:
                       entity_id: number.wl_tr_e32_segment_2_intensity
                     action: number.set_value
+                  - action: rest_command.custom_wled_command
+                    metadata: {}
+                    data:
+                      seg_id: 2
+                      pri_r: 138
+                      pri_g: 43
+                      pri_b: 226
+                      sec_r: 0
+                      sec_g: 0
+                      sec_b: 0
+                      ter_r: 0
+                      ter_g: 0
+                      ter_b: 0
+                    enabled: true
+                    alias: RESTful, Blue Violet, Black, Black
                   - action: light.turn_on
                     metadata: {}
                     target:
@@ -147,6 +173,21 @@ actions:
                       value: >-
                         {{ (states('sensor.x1c_00m09d481300476_print_progress') 
                         | float(0)) | round(0) }}
+                  - action: rest_command.custom_wled_command
+                    metadata: {}
+                    data:
+                      seg_id: 2
+                      pri_r: 255
+                      pri_g: 165
+                      pri_b: 0
+                      sec_r: 0
+                      sec_g: 0
+                      sec_b: 0
+                      ter_r: 0
+                      ter_g: 0
+                      ter_b: 0
+                    enabled: true
+                    alias: RESTful, Orange, Black, Black
                   - action: light.turn_on
                     metadata: {}
                     target:
@@ -210,18 +251,6 @@ actions:
             data:
               color_name: green
               brightness_pct: 50
-          - if:
-              - condition: state
-                entity_id: binary_sensor.x1c_00m09d481300476_enclosure_door
-                state:
-                  - "on"
-            then:
-              - action: light.turn_off
-                metadata: {}
-                target:
-                  entity_id: light.wl_tr_e32_machinestatus
-                data: {}
-            enabled: false
           - alias: Finished, but Heatbreak fan speed is below 1
             if:
               - condition: state
@@ -229,13 +258,6 @@ actions:
                 state:
                   - "0"
             then:
-              - action: light.turn_on
-                metadata: {}
-                target:
-                  entity_id: light.wl_tr_e32_machinestatus
-                data:
-                  effect: Breathe
-                  brightness_pct: 50
               - action: rest_command.custom_wled_command
                 metadata: {}
                 data:
@@ -250,26 +272,31 @@ actions:
                   ter_g: 0
                   ter_b: 0
                 enabled: true
+                alias: RESTful Green, Dark Green, Black
+              - action: light.turn_on
+                metadata: {}
+                target:
+                  entity_id: light.wl_tr_e32_machinestatus
+                data:
+                  effect: Breathe
+                  brightness_pct: 50
               - action: number.set_value
                 metadata: {}
                 target:
                   entity_id: number.wl_tr_e32_segment_2_intensity
                 data:
                   value: "200"
-              - action: timer.start
-                metadata: {}
-                data:
-                  duration:
-                    hours: 1
-                    minutes: 0
-                    seconds: 0
-                target:
-                  entity_id: timer.timer_x1cfinish
-              - action: light.turn_off
-                metadata: {}
-                target:
-                  entity_id: light.wl_tr_e32_machinestatus
-                data: {}
+              - if:
+                  - condition: trigger
+                    id:
+                      - X1C_Door_Open
+                then:
+                  - action: light.turn_off
+                    metadata: {}
+                    target:
+                      entity_id: light.wl_tr_e32_machinestatus
+                    data: {}
+        alias: If X1C Print status is Finish
       - conditions:
           - condition: state
             entity_id: sensor.x1c_00m09d481300476_print_status
@@ -281,6 +308,7 @@ actions:
             target:
               entity_id: light.wl_tr_e32_machinestatus
             data: {}
+        alias: If X1C Print status is Idle
     default:
       - action: light.turn_on
         metadata: {}
@@ -288,6 +316,25 @@ actions:
           entity_id: light.wl_tr_e32_main
         data:
           brightness_pct: "{{ states('sensor.wledring_light_brightness') }}"
+      - action: light.turn_on
+        metadata: {}
+        target:
+          entity_id:
+            - light.wl_tr_e32_lightstripstatus
+            - light.wl_tr_e32_machinestatus
+            - light.wl_tr_e32_lightchamberstatus
+        data:
+          color_name: black
+        enabled: false
+      - action: light.turn_off
+        metadata: {}
+        target:
+          entity_id:
+            - light.wl_tr_e32_lightchamberstatus
+            - light.wl_tr_e32_machinestatus
+            - light.wl_tr_e32_lightstripstatus
+        data: {}
+        enabled: false
   - alias: Chamber Light and Riser Light
     choose:
       - conditions:
